@@ -3,10 +3,10 @@ const bcrypt = require('bcryptjs');
 module.exports = {
     register: async (req, res) => {
         const { username, password } = req.body;
-        const profilePic = `https://robohash.org/${username}.png`;
+        const profilePicture = `https://robohash.org/${username}.png`;
         const db = req.app.get('db');
         try {
-            const [ existingUser ] = await db.find_user_by_username(username);
+            const [ existingUser ] = await db.user.find_user_by_username(username);
 
             if (existingUser) {
                 return res.status(409).send('Username already taken')
@@ -14,17 +14,17 @@ module.exports = {
 
             const salt = bcrypt.genSaltSync(10);
             const hash = bcrypt.hashSync(password, salt);
-            const createdUser = await db.create_user([username, hash, profilePic]);
+            const createdUser = await db.user.create_user([username, hash, profilePicture]);
             const user = createdUser[0];
 
             req.session.user = {
-                profilePic: user.profilePic,
+                profilePicture: user.profilePicture,
                 username: user.username,
                 id: user.id
             };
 
             /* not sure if you can do it this way or if you have to do it how i wrote it above */
-            // const [ createdUser ] = await db.create_user(username, hash, profilePic);
+            // const [ createdUser ] = await db.create_user(username, hash, profilePicture);
 
             // req.session.user = createdUser;
 

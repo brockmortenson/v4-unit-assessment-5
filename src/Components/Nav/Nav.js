@@ -4,6 +4,9 @@ import homeLogo from './../../assets/home_logo.png';
 import newLogo from './../../assets/new_logo.png';
 import logoutLogo from './../../assets/shut_down.png';
 import { Link, withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { updateUser } from '../../redux/reducer';
+import { logout } from '../../redux/reducer';
 import './Nav.css';
 
 class Nav extends Component {
@@ -20,20 +23,24 @@ class Nav extends Component {
 
   getUser() {
     axios.get('/api/auth/me')
-    .then(res => 'replace this string with something useful')
+    .then(res => {
+      updateUser(res.data)})
   }
   
   logout() {
     axios.post('/api/auth/logout')
-      .then(_ => 'replace this string with something else')
+      .then(_ => {
+        logout()})
   }
   
   render() {
+    console.log(this.props)
       return this.props.location.pathname !== '/' &&
         <div className='nav'>
           <div className='nav-profile-container'>
-            <div className='nav-profile-pic'></div>
-            <p>placeholder username</p>
+                                                      {/* including 'url' throws an error */}
+            <div className='nav-profile-pic' style={{ backgroundImage: (`${this.props.profilePicture}`) }}></div>
+            <p>{this.props.username}{this.props.profilePicture}</p>
           </div>
           <div className='nav-links'>
             <Link to='/dash'><img className='nav-img' src={homeLogo} alt='home' /></Link>
@@ -44,4 +51,13 @@ class Nav extends Component {
   }
 }
 
+// function mapStateToProps(state) {
+//   return {
+//     updateUser: state.updateUser,
+//     logout: state.logout
+//   }
+// };
+
+// When I have the function uncommented and the line below starting right after 'withRouter' I get some errors and I CANNOT figure out what the problem is...perhaps some bad code I did earlier in the assessment...
+// (connect(mapStateToProps, {updateUser, logout}))
 export default withRouter(Nav);
